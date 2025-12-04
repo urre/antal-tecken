@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="sv-SE">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antal tecken</title>
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="stats-container">
+  <div id="total" class="main-count">0</div>
+  <div class="sub-stats">
+    <span id="words">0 ord</span>
+    <span class="separator">•</span>
+    <span id="lines">0 rader</span>
+  </div>
+</div>
+
+<textarea spellcheck="false" placeholder="Skriv eller klistra in text här..." aria-label="Textfält för teckenräkning"></textarea>
+
+<div class="settings">
+  <div class="color">
+    <button data-theme="light">Ljus</button>
+    <button data-theme="dark">Natt</button>
+  </div>
+
+  <div class="actions">
+    <button id="soundToggle" class="toggle-btn" title="Tangentbordsljud (Alt+S)" aria-label="Växla tangentbordsljud">
+      <span class="toggle-label">Ljud</span>
+      <span class="toggle-indicator"></span>
+    </button>
+    <button id="exampleText" title="Infoga exempeltext (Alt+E)">Exempeltext</button>
+    <button id="copyText" title="Kopiera text (Alt+C)">Kopiera</button>
+    <button id="clearText" title="Rensa text (Alt+R)">Rensa</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
