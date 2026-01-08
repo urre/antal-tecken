@@ -13,89 +13,28 @@ const exampleText = 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. A
 // Keyboard sound functionality
 let soundEnabled = localStorage.getItem('soundEnabled') === 'true';
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let clankBuffer = null;
+
+// Load the clank sound
+fetch('clank.wav')
+  .then(response => response.arrayBuffer())
+  .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+  .then(buffer => {
+    clankBuffer = buffer;
+  })
+  .catch(err => console.error('Error loading clank.wav:', err));
 
 function playKeySound() {
-  if (!soundEnabled) return;
+  if (!soundEnabled || !clankBuffer) return;
 
-  const now = audioContext.currentTime;
+  const source = audioContext.createBufferSource();
+  source.buffer = clankBuffer;
 
-  // Three different frequencies for variety
-  const frequencies = [150, 200, 250];
-  const freq = frequencies[Math.floor(Math.random() * frequencies.length)];
+  // Add slight randomization to pitch for variety
+  source.playbackRate.value = 0.95 + Math.random() * 0.1;
 
-  // Main click sound
-  const click = audioContext.createOscillator();
-  const clickGain = audioContext.createGain();
-  click.connect(clickGain);
-  clickGain.connect(audioContext.destination);
-
-  click.frequency.value = freq;
-  click.type = 'square';
-
-  clickGain.gain.setValueAtTime(0.08, now);
-  clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
-
-  click.start(now);
-  click.stop(now + 0.02);
-
-  // Body/resonance sound
-  const body = audioContext.createOscillator();
-  const bodyGain = audioContext.createGain();
-  body.connect(bodyGain);
-  bodyGain.connect(audioContext.destination);
-
-  body.frequency.value = freq * 1.5;
-  body.type = 'triangle';
-
-  bodyGain.gain.setValueAtTime(0.04, now);
-  bodyGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-
-  body.start(now);
-  body.stop(now + 0.08);
-
-  // Bottom-out thock
-  const thock = audioContext.createOscillator();
-  const thockGain = audioContext.createGain();
-  thock.connect(thockGain);
-  thockGain.connect(audioContext.destination);
-
-  thock.frequency.value = freq * 0.8;
-  thock.type = 'sine';
-
-  thockGain.gain.setValueAtTime(0, now + 0.01);
-  thockGain.gain.setValueAtTime(0.06, now + 0.015);
-  thockGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
-
-  thock.start(now + 0.01);
-  thock.stop(now + 0.06);
-
-  // White noise
-  const bufferSize = audioContext.sampleRate * 0.03;
-  const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-  const output = noiseBuffer.getChannelData(0);
-
-  for (let i = 0; i < bufferSize; i++) {
-    output[i] = Math.random() * 2 - 1;
-  }
-
-  const noise = audioContext.createBufferSource();
-  const noiseGain = audioContext.createGain();
-  const noiseFilter = audioContext.createBiquadFilter();
-
-  noise.buffer = noiseBuffer;
-  noise.connect(noiseFilter);
-  noiseFilter.connect(noiseGain);
-  noiseGain.connect(audioContext.destination);
-
-  noiseFilter.type = 'bandpass';
-  noiseFilter.frequency.value = freq * 2;
-  noiseFilter.Q.value = 2;
-
-  noiseGain.gain.setValueAtTime(0.03, now);
-  noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
-
-  noise.start(now);
-  noise.stop(now + 0.03);
+  source.connect(audioContext.destination);
+  source.start(0);
 }
 
 function updateSoundToggle() {
